@@ -2,6 +2,10 @@ const net = require('net')
 const http = require('http')
 
 const server = net.createServer((socket) => {
+    socket.on('data', (data) => {
+        console.log("data is coming...",data.toString('utf-8'));
+        
+    })
 
 })
 
