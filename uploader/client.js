@@ -10,7 +10,18 @@ const socket = net.createConnection({
     const fileStream = fileHandle.createReadStream();
     
     fileStream.on('data', (data) => {
-        socket.write(data);
+        if(!socket.write(data)){
+            fileStream.pause();
+        }
+    });
+
+    socket.on('drain', () => {
+        fileStream.resume();
+    });
+
+    fileStream.on('end', () => {
+        console.log('upload successfully.');
+        socket.end();
     });
 });
 
