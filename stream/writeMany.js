@@ -78,6 +78,55 @@ const fs = require('node:fs/promises');
  */
 
 const fs = require('node:fs/promises');
+// clearer solution than below
+(
+    async () => {
+        console.time('Wrtie_stream');
+        let fileHandle;
+
+        try {
+            fileHandle = await fs.open('./stream/text.txt', 'w');
+            const writeStream = fileHandle.createWriteStream();
+
+            let i = 0;
+            const total = 1_000_000;
+            const stop_at = 99_999; //since i starts from 0
+
+            const writeBuff = () => {
+                let write_ok = true;
+                while (i < total && write_ok) {
+                    const buff = Buffer.from(`${i}`, 'utf-8');
+                    write_ok = writeStream.write(buff);
+                    i++;
+
+                    if(i = stop_at){
+                        console.log(`stopping at ${stop_at}...`);
+                        writeStream.end(() => {
+                            console.timeEnd('Wrtie_stream');
+                            console.log("Steam closed.");
+                            
+                        });
+                        return; // stop executaion after ending stream
+                    }
+
+                    if(i < total){
+                        writeStream.once('drain', writeBuff);
+                    }
+                }
+            }
+            writeBuff(); //start writing
+        } catch (error) {
+            console.log(error);
+            
+        }finally{
+            if(fileHandle){
+                await fileHandle.close();// ensure fileHandle always closed.
+            }
+        }
+    })();
+
+
+/** 
 
 (
     async () => {
@@ -117,3 +166,4 @@ const fs = require('node:fs/promises');
 
     }
 )();
+*/
