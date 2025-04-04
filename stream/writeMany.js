@@ -72,7 +72,7 @@ const fs = require('node:fs/promises');
 */
 
 /**
- * Use read/write stream to smooth memory usage
+ * Use drain for a write stream to smooth memory usage
  * time:
  * memory:
  */
@@ -94,17 +94,26 @@ const fs = require('node:fs/promises');
                if(!writeStream.write(buff)){
                    break; 
                }    
+
+               if(i === 99999) {
+                return writeStream.end(buff);
+               }
             }
         }
 
         writeBuff();
 
+        // resume loop when buff is empty
         writeStream.on('drain', ()=>{
             console.log('cleaning buff...');
             writeBuff();
             
         });
 
-        console.timeEnd("R/W stream");
+        writeStream.on('finish', () => {
+            console.timeEnd("R/W stream");
+            fileHandle.close();
+        })
+
     }
 )();
