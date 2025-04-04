@@ -79,12 +79,13 @@ const fs = require('node:fs/promises');
 
 const fs = require('node:fs/promises');
 // clearer solution than below
+//TODO: handle last number
 (
     async () => {
         console.time('Wrtie_stream');
         let fileHandle;
+        let t = 0; // count drain
 
-        try {
             fileHandle = await fs.open('./stream/text.txt', 'w');
             const writeStream = fileHandle.createWriteStream();
 
@@ -99,7 +100,7 @@ const fs = require('node:fs/promises');
                     write_ok = writeStream.write(buff);
                     i++;
 
-                    if(i = stop_at){
+                    if(i === stop_at){
                         console.log(`stopping at ${stop_at}...`);
                         writeStream.end(() => {
                             console.timeEnd('Wrtie_stream');
@@ -108,21 +109,19 @@ const fs = require('node:fs/promises');
                         });
                         return; // stop executaion after ending stream
                     }
-
-                    if(i < total){
-                        writeStream.once('drain', writeBuff);
-                    }
+                }
+                
+                if(i < total){
+                    writeStream.once('drain', ()=>{
+                        writeBuff();
+                        t++;
+                        console.log(`Drain...${t}`);
+                        
+                    });
                 }
             }
             writeBuff(); //start writing
-        } catch (error) {
-            console.log(error);
-            
-        }finally{
-            if(fileHandle){
-                await fileHandle.close();// ensure fileHandle always closed.
-            }
-        }
+       
     })();
 
 
