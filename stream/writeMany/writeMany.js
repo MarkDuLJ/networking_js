@@ -96,7 +96,7 @@ const fs = require('node:fs/promises');
             const writeBuff = () => {
                 let write_ok = true;
                 while (i < total && write_ok) {
-                    const buff = Buffer.from(`${i}`, 'utf-8');
+                    const buff = Buffer.from(`${i} `, 'utf-8');
                     write_ok = writeStream.write(buff);
                     i++;
 
