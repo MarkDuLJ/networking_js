@@ -1,4 +1,5 @@
 const fs = require('node:fs/promises');
+const Stream = require('node:stream');
 
 (
     async () => {
@@ -31,16 +32,22 @@ const fs = require('node:fs/promises');
                 broken_num = numbers.pop();
             }
 
-            console.log(numbers);
+            // console.log(numbers);
             
-            
-            
+            numbers.forEach(number => {
+                let n = Number(number);
+
+                if(n % 2 === 0){
+                    if(!writeStream.write(`${n} `)){
+                        readStream.pause();
+                    }
+                }
+            });    
         });
 
         writeStream.on('drain', () => readStream.resume());
-
-        
-        writeStream.on('finish', ()=>{
+   
+        writeStream.on('close', ()=>{
             console.timeEnd("RW_time");
         })
     }
