@@ -47,7 +47,7 @@ const Stream = require('node:stream');
 
         writeStream.on('drain', () => readStream.resume());
    
-        writeStream.on('close', ()=>{
+        readStream.on('end', ()=>{
             console.timeEnd("RW_time");
         })
     }
